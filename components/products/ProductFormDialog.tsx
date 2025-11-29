@@ -63,7 +63,7 @@ export function ProductFormDialog({
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(productSchema) as any,
     defaultValues: {
       name: "",
       price: 0,
