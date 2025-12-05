@@ -3,10 +3,10 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
+    // All requests now go through Next.js API routes, same origin
+    baseUrl: "/api",
     credentials: "include"
   }),
-  
   endpoints: (builder) => ({
     login: builder.mutation<{ email: string }, { email: string; password: string }>({
       query: (body) => ({
@@ -31,7 +31,6 @@ export const apiSlice = createApi({
       query: () => ({
         url: "/products"
       })
-      
     }),
 
     createProduct: builder.mutation<any, Partial<any>>({
@@ -40,7 +39,6 @@ export const apiSlice = createApi({
         method: "POST",
         body
       })
-      
     }),
 
     updateProduct: builder.mutation<any, { id: string; data: any }>({
@@ -49,7 +47,6 @@ export const apiSlice = createApi({
         method: "PUT",
         body: data
       })
-      
     }),
 
     updateProductStatus: builder.mutation<any, { id: string; status: string }>({
@@ -58,7 +55,6 @@ export const apiSlice = createApi({
         method: "PATCH",
         body: { status }
       })
-      
     }),
 
     deleteProduct: builder.mutation<{ success: boolean }, string>({
@@ -66,7 +62,6 @@ export const apiSlice = createApi({
         url: `/products/${id}`,
         method: "DELETE"
       })
-      
     })
   })
 });
@@ -81,4 +76,3 @@ export const {
   useUpdateProductStatusMutation,
   useDeleteProductMutation
 } = apiSlice;
-
