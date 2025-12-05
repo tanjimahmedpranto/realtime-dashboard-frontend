@@ -1,26 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_API_URL = process.env.BACKEND_API_URL!;
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 export async function PATCH(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = context.params;
-  const body = await request.json();
+  try {
+    // Next 16 expects params as a Promise now
+    const { id } = await context.params;
 
-  const backendRes = await fetch(
-    `${BACKEND_API_URL}/products/${id}/status`,
-    {
+    const body = await request.json();
+
+    const backendRes = await fetch(`${BACKEND_URL}/products/${id}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        cookie: request.headers.get("cookie") ?? ""
+        // forward any cookies (for your HttpOnly token at the backend domain)
+        cookie: request.headers.get("cookie") ?? "",
       },
-      body: JSON.stringify(body)
-    }
-  );
+    });
 
-  const data = await backendRes.json();
-  return NextResponse.json(data, { status: backendRes.status });
+    const data = await backendRes.json();
+
+    return new NextResponse(JSON.stringify(data), {
+      status: backendRes.status,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    console.error("Error in /api/products/[id]/status proxy:", err);
+    return new NextResponse(
+      JSON.stringify({ message: "Failed to update product status" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
 }
