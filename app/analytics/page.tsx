@@ -1,5 +1,5 @@
 "use client";
-
+export const dynamic = "force-dynamic";
 import { useMemo } from "react";
 import { useRealtimeProducts } from "@/hooks/useRealtimeProducts";
 import { Product } from "@/types/product";

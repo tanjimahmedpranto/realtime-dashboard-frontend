@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { MainNav } from "@/components/layout/MainNav";
 import { ProductTable } from "@/components/products/ProductTable";
 
