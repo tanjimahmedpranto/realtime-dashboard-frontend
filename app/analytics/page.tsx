@@ -1,10 +1,12 @@
 "use client";
-export const dynamic = "force-dynamic";
+
 import { useMemo } from "react";
 import { useRealtimeProducts } from "@/hooks/useRealtimeProducts";
 import { Product } from "@/types/product";
 
 import { MainNav } from "@/components/layout/MainNav";
+
+import { RequireAuth } from "@/components/auth/RequireAuth";
 
 import {
   Card,
@@ -112,6 +114,7 @@ export default function AnalyticsPage() {
   );
 
   return (
+  <RequireAuth>
     <div className="min-h-screen bg-slate-100">
       <MainNav />
       <main className="max-w-6xl mx-auto p-6 space-y-6">
@@ -272,5 +275,6 @@ export default function AnalyticsPage() {
         )}
       </main>
     </div>
+	</RequireAuth>
   );
 }
