@@ -1,6 +1,7 @@
+import { RequireAuth } from "@/components/auth/RequireAuth";
 import { MainNav } from "@/components/layout/MainNav";
 import { ProductTable } from "@/components/products/ProductTable";
-import { RequireAuth } from "@/components/auth/RequireAuth";
+
 
 export default function ProductsPage() {
   return (

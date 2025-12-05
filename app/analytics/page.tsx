@@ -1,12 +1,12 @@
 "use client";
-
+import { RequireAuth } from "@/components/auth/RequireAuth";
 import { useMemo } from "react";
 import { useRealtimeProducts } from "@/hooks/useRealtimeProducts";
 import { Product } from "@/types/product";
 
 import { MainNav } from "@/components/layout/MainNav";
 
-import { RequireAuth } from "@/components/auth/RequireAuth";
+
 
 import {
   Card,

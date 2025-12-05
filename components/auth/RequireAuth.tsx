@@ -1,47 +1,38 @@
 "use client";
 
 import { ReactNode, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useMeQuery } from "@/lib/apiSlice";
 
-interface RequireAuthProps {
+type RequireAuthProps = {
   children: ReactNode;
-}
+};
 
 export function RequireAuth({ children }: RequireAuthProps) {
-  const router = useRouter();
   const { data, error, isLoading } = useMeQuery();
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading) {
-      const unauthenticated =
-        error ||
-        !data ||
-        !("email" in data) ||
-        !data.email;
+    if (isLoading) return;
 
-      if (unauthenticated) {
-        router.replace("/login");
-      }
+    // If /auth/me fails or returns no user, redirect to /login
+    if (error || !data?.email) {
+      const from = encodeURIComponent(pathname || "/products");
+      router.replace(`/login?from=${from}`);
     }
-  }, [isLoading, error, data, router]);
+  }, [data, error, isLoading, router, pathname]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-slate-600">
-        Checking authentication...
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-sm text-slate-600">Checking session…</p>
       </div>
     );
   }
 
-  // While redirecting away, render nothing
-  const unauthenticated =
-    error ||
-    !data ||
-    !("email" in data) ||
-    !data.email;
-
-  if (unauthenticated) {
+  if (error || !data?.email) {
+    // While redirecting, render nothing
     return null;
   }
 
