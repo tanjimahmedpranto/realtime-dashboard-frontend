@@ -10,7 +10,7 @@ function getTokenFromCookies(req: NextRequest) {
   return req.cookies.get("token")?.value;
 }
 
-// PATCH /api/products/[id]/status  →  PATCH {BACKEND_URL}/products/:id/status
+// PATCH /api/products/[id]/status → PATCH {BACKEND_URL}/products/:id/status
 export async function PATCH(req: NextRequest, context: any) {
   const token = getTokenFromCookies(req);
   if (!token) {

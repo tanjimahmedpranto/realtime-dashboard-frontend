@@ -64,6 +64,6 @@ export async function DELETE(req: NextRequest, context: any) {
     data = null;
   }
 
-  // Backend sends `{ success: true }` on success
+  // if backend returns nothing but 200, still send a success flag
   return NextResponse.json(data ?? { success: res.ok }, { status: res.status });
 }
