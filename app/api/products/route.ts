@@ -1,31 +1,65 @@
+// app/api/products/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_API_URL = process.env.BACKEND_API_URL!;
+const BACKEND_URL =
+  process.env.BACKEND_API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:4000";
 
-export async function GET(request: NextRequest) {
-  const backendRes = await fetch(`${BACKEND_API_URL}/products`, {
-    method: "GET",
-    headers: {
-      cookie: request.headers.get("cookie") ?? ""
-    }
-  });
-
-  const data = await backendRes.json();
-  return NextResponse.json(data, { status: backendRes.status });
+function getTokenFromCookies(req: NextRequest) {
+  return req.cookies.get("token")?.value;
 }
 
-export async function POST(request: NextRequest) {
-  const body = await request.json();
+// GET /api/products  →  GET {BACKEND_URL}/products
+export async function GET(req: NextRequest) {
+  const token = getTokenFromCookies(req);
+  if (!token) {
+    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+  }
 
-  const backendRes = await fetch(`${BACKEND_API_URL}/products`, {
+  const res = await fetch(`${BACKEND_URL}/products`, {
+    method: "GET",
+    headers: {
+      Cookie: `token=${token}`,
+    },
+  });
+
+  const text = await res.text();
+  let data: any = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = null;
+  }
+
+  return NextResponse.json(data, { status: res.status });
+}
+
+// POST /api/products  →  POST {BACKEND_URL}/products
+export async function POST(req: NextRequest) {
+  const token = getTokenFromCookies(req);
+  if (!token) {
+    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+  }
+
+  const body = await req.json();
+
+  const res = await fetch(`${BACKEND_URL}/products`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      cookie: request.headers.get("cookie") ?? ""
+      Cookie: `token=${token}`,
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   });
 
-  const data = await backendRes.json();
-  return NextResponse.json(data, { status: backendRes.status });
+  const text = await res.text();
+  let data: any = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = null;
+  }
+
+  return NextResponse.json(data, { status: res.status });
 }
