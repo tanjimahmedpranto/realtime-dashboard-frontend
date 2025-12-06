@@ -1,69 +1,74 @@
+// lib/apiSlice.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    // All requests now go through Next.js API routes, same origin
+    // Always talk to our Next.js API routes
     baseUrl: "/api",
-    credentials: "include"
+    credentials: "include",
   }),
   endpoints: (builder) => ({
-    login: builder.mutation<{ email: string }, { email: string; password: string }>({
-      query: (body) => ({
-        url: "/auth/login",
-        method: "POST",
-        body
-      })
-    }),
+    login: builder.mutation<{ email: string }, { email: string; password: string }>(
+      {
+        query: (body) => ({
+          url: "/auth/login",
+          method: "POST",
+          body,
+        }),
+      }
+    ),
+
     logout: builder.mutation<{ success: boolean }, void>({
       query: () => ({
         url: "/auth/logout",
-        method: "POST"
-      })
+        method: "POST",
+      }),
     }),
+
     me: builder.query<{ email: string }, void>({
       query: () => ({
-        url: "/auth/me"
-      })
+        url: "/auth/me",
+      }),
     }),
 
     getProducts: builder.query<any[], void>({
       query: () => ({
-        url: "/products"
-      })
+        url: "/products",
+      }),
     }),
 
     createProduct: builder.mutation<any, Partial<any>>({
       query: (body) => ({
         url: "/products",
         method: "POST",
-        body
-      })
+        body,
+      }),
     }),
 
     updateProduct: builder.mutation<any, { id: string; data: any }>({
       query: ({ id, data }) => ({
         url: `/products/${id}`,
         method: "PUT",
-        body: data
-      })
+        body: data,
+      }),
     }),
 
     updateProductStatus: builder.mutation<any, { id: string; status: string }>({
       query: ({ id, status }) => ({
         url: `/products/${id}/status`,
         method: "PATCH",
-        body: { status }
-      })
+        body: { status },
+      }),
     }),
 
     deleteProduct: builder.mutation<{ success: boolean }, string>({
       query: (id) => ({
         url: `/products/${id}`,
-        method: "DELETE"
-      })
-    })
-  })
+        method: "DELETE",
+      }),
+    }),
+  }),
 });
 
 export const {
@@ -74,5 +79,5 @@ export const {
   useCreateProductMutation,
   useUpdateProductMutation,
   useUpdateProductStatusMutation,
-  useDeleteProductMutation
+  useDeleteProductMutation,
 } = apiSlice;
