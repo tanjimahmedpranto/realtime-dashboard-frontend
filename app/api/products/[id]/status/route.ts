@@ -1,41 +1,44 @@
 // app/api/products/[id]/status/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL =
-  process.env.BACKEND_API_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:4000";
+const BACKEND_API_URL = process.env.BACKEND_API_URL;
 
-function getTokenFromCookies(req: NextRequest) {
-  return req.cookies.get("token")?.value;
+if (!BACKEND_API_URL) {
+  throw new Error("BACKEND_API_URL is not set in environment");
 }
 
-// PATCH /api/products/[id]/status → PATCH {BACKEND_URL}/products/:id/status
 export async function PATCH(req: NextRequest, context: any) {
-  const token = getTokenFromCookies(req);
-  if (!token) {
-    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+  const params = await context.params;
+  const id = params.id as string;
+
+  const url = `${BACKEND_API_URL}/products/${id}/status`;
+
+  const token = req.cookies.get("token")?.value;
+
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers["Cookie"] = `token=${token}`;
   }
 
-  const { id } = context.params as { id: string };
-  const body = await req.json();
+  const body = JSON.stringify(await req.json());
 
-  const res = await fetch(`${BACKEND_URL}/products/${id}/status`, {
+  const backendRes = await fetch(url, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: `token=${token}`,
-    },
-    body: JSON.stringify(body),
+    headers,
+    body,
+    credentials: "include",
   });
 
-  const text = await res.text();
-  let data: any = null;
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    data = null;
-  }
+  const text = await backendRes.text();
 
-  return NextResponse.json(data, { status: res.status });
+  return new NextResponse(text || null, {
+    status: backendRes.status,
+    headers: {
+      "Content-Type":
+        backendRes.headers.get("Content-Type") || "application/json",
+    },
+  });
 }
